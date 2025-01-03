@@ -1,5 +1,5 @@
-open Core
-open Sexplib.Sexp
+open Core;;
+open Sexplib.Std;;
 
 type direction = Left | Right
 [@@deriving sexp_of, sexp, compare]
@@ -19,7 +19,7 @@ module Lang = struct
       | Exists of string * t
     [@@deriving sexp_of, sexp, compare]
 
-    let to_string t = Sexp.to_string_hum (sexp_of_t t)
+    let to_string t: string = Sexp.to_string_hum (sexp_of_t t)
   end
 
   module Pattern = struct
@@ -55,6 +55,8 @@ module Lang = struct
   end
 end
 
+module StringMap = Map.Make(String);;
+
 module IR = struct
   module Type = struct
     type t =
@@ -67,38 +69,35 @@ module IR = struct
       | Exists of string * t
     [@@deriving sexp_of, sexp, compare]
 
-    let to_string t = Sexp.to_string_hum (sexp_of_t t)
+    let to_string (t: t) = Sexp.to_string_hum (sexp_of_t t)
 
     let rec substitute (x : string) (tau' : t) (tau : t) : t =
       match tau with
       | Int -> tau
-      | Var x' -> if x' = x' then tau' else tau
+      | Var x' -> if String.equal x x'  then tau' else tau
       | Fn (tau1, tau2) -> Fn (substitute x tau' tau1, substitute x tau' tau2)
       | Product (tau1, tau2) -> Product (substitute x tau' tau1, substitute x tau' tau2)
       | Sum (tau1, tau2) -> Sum (substitute x tau' tau1, substitute x tau' tau2)
       | ForAll (x', tau_all) ->
-        if x = x' then tau
+        if String.equal x x' then tau
         else ForAll(x', substitute x tau' tau_all)
       | Exists (x', tau_exists) ->
-        if x = x' then tau
+        if String.equal x x' then tau
         else Exists(x', substitute x tau' tau_exists)
 
     let to_debruijn (tau : t) : t =
-      let rec aux (depths : int String.Map.t) (tau : t) =
+      let rec aux (depths : int StringMap.t) (tau : t) =
         let same_depth = aux depths in
         let incr_depth x tau =
           aux
-            (String.Map.add
-               (String.Map.map depths ~f:(fun x -> x + 1))
-               ~key:x
-               ~data:0)
+            (Map.set (Map.map depths ~f:(fun x -> x+1)) ~key:x ~data:0)
           tau
         in
         match tau with
         | Int -> Int
         | Var x ->
           Var (Int.to_string (
-            match String.Map.find depths x with
+            match Map.find depths x with
             | Some n -> n
             | None -> 0))
         | Fn (tau1, tau2) -> Fn (same_depth tau1, same_depth tau2)
@@ -107,13 +106,13 @@ module IR = struct
         | ForAll (x, tau) -> ForAll(x, incr_depth x tau)
         | Exists (x, tau) -> Exists(x, incr_depth x tau)
       in
-      aux String.Map.empty tau
+      aux StringMap.empty tau
 
     let aequiv (tau1 : t) (tau2 : t) : bool =
       let rec aequiv_aux (tau1 : t) (tau2 : t) : bool =
         match (tau1, tau2) with
         | (Int, Int) -> true
-        | (Var x, Var x') -> x = x'
+        | (Var x, Var x') -> String.equal x x'
         | (Fn (arg1, ret1), Fn (arg2, ret2)) ->
           aequiv_aux arg1 arg2 && aequiv_aux ret1 ret2
         | (Product (l1, r1), Product (l2, r2)) ->
@@ -161,8 +160,8 @@ module IR = struct
     let rec substitute x t' t =
       match t with
       | Int _ -> t
-      | Var x' -> if x = x' then t' else t
-      | Lam (x', ty, body) -> if x = x' then t else Lam (x', ty, substitute x t' body)
+      | Var x' -> if String.equal x x' then t' else t
+      | Lam (x', ty, body) -> if String.equal x x' then t else Lam (x', ty, substitute x t' body)
       | App (t1, t2) -> App (substitute x t' t1, substitute x t' t2)
       | Binop (b, t1, t2) -> Binop (b, substitute x t' t1, substitute x t' t2)
       | Tuple (t1, t2) -> Tuple (substitute x t' t1, substitute x t' t2)
@@ -170,8 +169,8 @@ module IR = struct
       | Inject (t, dir, tau) -> Inject (substitute x t' t, dir, tau)
       | Case (t, (x1, t1), (x2, t2)) ->
         Case (substitute x t' t,
-              (x1, if x = x1 then t1 else substitute x t' t1),
-              (x2, if x = x2 then t2 else substitute x t' t2))
+              (x1, if String.equal x x1 then t1 else substitute x t' t1),
+              (x2, if String.equal x x2 then t2 else substitute x t' t2))
       | TLam (v, t) -> TLam (v, substitute x t' t)
       | TApp (t, tau) -> TApp (substitute x t' t, tau)
       | TPack (tau1, t, tau2) -> TPack (tau1, substitute x t' t, tau2)

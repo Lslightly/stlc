@@ -1,0 +1,1 @@
+`opam install core menhir ocaml-lsp-server odoc ocamlformat utop ppx_deriving`
