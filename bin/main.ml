@@ -18,13 +18,12 @@ let run filename =
     let term = Translator.translate term in
     Printf.printf "Translated: %s\n" (IR.Term.to_string term);
     Typechecker.typecheck term
-    (* Ok IR.Type.Int *)
-    (* >>= fun ty ->
+    >>= fun ty ->
     Printf.printf "Type: %s\n" (IR.Type.to_string ty);
-    Interpreter.eval term *)
+    Interpreter.eval term
   in
   match result with
-  | Ok e -> Printf.printf "Success: %s\n" (IR.Type.to_string e)
+  | Ok e -> Printf.printf "Success: %s\n" (IR.Term.to_string e)
   | Error s -> Printf.printf "Error: %s\n" s
 
 let main () =

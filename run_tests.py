@@ -68,6 +68,7 @@ for test in config["tests"]:
         exec_res = subprocess.check_output(userExec + test["command"], timeout=timeout, stderr=subprocess.STDOUT, shell=True)
         exec_sol = subprocess.check_output(solExec + test["command"], timeout=timeout, stderr=subprocess.STDOUT, shell=True)
         sol = exec_sol.decode("utf-8")
+        sol = sol.removeprefix("[WARNING] Running as root is not recommended\n") # execute ocamlrun in root user will cause the warning
         result = exec_res.decode("utf-8")
     except Exception as e:
         result = "Python Exception " + str(e)
