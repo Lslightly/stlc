@@ -5,23 +5,21 @@
 (generate_opam_files true)
 
 (source
- (github username/reponame))
+ (github Lslightly/stcl))
 
-(authors "Author Name")
+(authors "Lslightly")
 
-(maintainers "Maintainer Name")
+(maintainers "Lslightly")
 
-(license LICENSE)
-
-(documentation https://url/to/documentation)
+(license MIT)
 
 (package
  (name stlc)
- (synopsis "A short synopsis")
- (description "A longer description")
+ (synopsis "stlc")
+ (description "Simply typed lambda calculus")
  (depends ocaml dune)
  (tags
-  (topics "to describe" your project)))
+  (topics "type checker" your project)))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
 

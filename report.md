@@ -2,7 +2,7 @@
 
 重构后的本地环境需要使用`ocaml 5.2.1`，可以通过2.3.0版本的opam通过以下命令配置本地环境。
 
-```
+```bash
 opam switch create 5.2.1
 opam install core menhir ocaml-lsp-server odoc ocamlformat utop ppx_deriving core_unix
 ```
@@ -11,7 +11,7 @@ opam install core menhir ocaml-lsp-server odoc ocamlformat utop ppx_deriving cor
 
 由于使用了`ocaml 5.2.1`重构了项目，项目管理工具改用`dune`，因此对测试脚本进行了修改。
 
-另外对镜像进行了修改，方便`run_tests.py`使用容器镜像进行测试。执行以下指令已创建名为`pldpa`的容器并执行测试。
+另外对镜像进行了修改，方便`run_tests.py`使用容器镜像进行测试。执行以下指令创建名为`pldpa`的容器并执行测试。
 
 ```bash
 docker pull lslightly2357/cs242 # 拉取镜像
@@ -23,7 +23,19 @@ python run_tests.py # 执行测试
 
 `user.sh`会调用`./_build/default/bin/main.exe`构建好的二进制文件对tests文件进行解析、检查、解释等操作。
 
-`run_tests.py`的唯一改动在于使用`dune build`构建项目。
+`run_tests.py`的改动之处在于使用`dune build`构建项目以及对solution结果的处理。由于docker container使用root用户，`ocamlrun`会输出warning，对答案产生影响，因此需要去除warning。
+
+## 实验思路
+
+按照[README.md](README.md)给出的规则编写match匹配语句即可。
+
+### typechecker
+
+typechecker部分的一些难点在于对`env`和`tenv`的处理。当出现 $\Gamma, x: \tau_1 \vdash t: \tau_2$ 时，需要将 $x: \tau_1$ 将入`env`中(Map.set)。对于 $\Gamma, X \vdash ...$ 的情况，需要将X加入`tenv`中(Set.add)。
+
+### interpreter
+
+interpreter需在每个trystep case处理Err的情况，需要通过`Err e -> Err e`将错误传递给上层。
 
 ## 实验遇到的困难与解决
 
