@@ -1,4 +1,6 @@
 (executable
  (public_name stlc)
  (name main)
- (libraries stlc))
+ (preprocess (pps ppx_sexp_conv ppx_compare ppx_let))
+ (libraries stlc core core_unix.command_unix)
+)

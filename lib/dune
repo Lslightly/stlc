@@ -1,7 +1,9 @@
 (library
  (name stlc)
- (preprocess (pps ppx_sexp_conv ppx_compare))
- (libraries core))
+ (preprocess (pps ppx_sexp_conv ppx_compare ppx_let))
+ (libraries core core_unix.command_unix))
+
+(ocamllex lexer)
 
 (menhir
   (modules parser)
