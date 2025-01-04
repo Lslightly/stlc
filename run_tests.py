@@ -51,7 +51,6 @@ result = ""
 try:
     exec_make = subprocess.check_output("dune build > /dev/null", timeout=300, stderr=subprocess.STDOUT, shell=True)
     make_res = exec_make.decode("utf-8")
-    pass
 except Exception as e:
     result = "Python Exception " + str(e)
 if result == "":

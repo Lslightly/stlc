@@ -23,7 +23,16 @@ python run_tests.py # 执行测试
 
 `user.sh`会调用`./_build/default/bin/main.exe`构建好的二进制文件对tests文件进行解析、检查、解释等操作。
 
-`run_tests.py`的改动之处在于使用`dune build`构建项目以及对solution结果的处理。由于docker container使用root用户，`ocamlrun`会输出warning，对答案产生影响，因此需要去除warning。
+`run_tests.py`的改动之处在于使用`dune build`构建项目以及对solution结果的处理。由于docker container使用root用户，`ocamlrun`会输出warning，对答案产生影响，因此需要去除warning。以下是diff结果:
+
+```bash
+52c52
+<     exec_make = subprocess.check_output("dune build > /dev/null", timeout=300, stderr=subprocess.STDOUT, shell=True)
+---
+>     exec_make = subprocess.check_output("make > /dev/null", timeout=300, stderr=subprocess.STDOUT, shell=True)
+70d69
+<         sol = sol.removeprefix("[WARNING] Running as root is not recommended\n") # execute ocamlrun in root user will cause the warning
+```
 
 ## 实验思路
 
