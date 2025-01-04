@@ -17,8 +17,8 @@ let run filename =
     Printf.printf "Term: %s\n" (Lang.Term.to_string term);
     let term = Translator.translate term in
     Printf.printf "Translated: %s\n" (IR.Term.to_string term);
-    (* Typechecker.typecheck term *)
-    Ok IR.Type.Int
+    Typechecker.typecheck term
+    (* Ok IR.Type.Int *)
     (* >>= fun ty ->
     Printf.printf "Type: %s\n" (IR.Type.to_string ty);
     Interpreter.eval term *)
