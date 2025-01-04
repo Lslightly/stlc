@@ -7,7 +7,7 @@ opam switch create 5.2.1
 opam install core menhir ocaml-lsp-server odoc ocamlformat utop ppx_deriving core_unix
 ```
 
-重构版本代码见[Lslight/stlc](https://github.com/Lslightly/stlc)。
+重构版本代码见[Lslightly/stlc](https://github.com/Lslightly/stlc)。
 
 ## 实验测试
 
