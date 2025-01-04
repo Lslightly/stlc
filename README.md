@@ -2,14 +2,15 @@
 
 <!-- TOC -->
 
-- [Setup](#setup)
-- [Requirements](#requirements)
-- [Submitting](#submitting)
-- [Language specification](#language-specification)
-- [Part1: Translator](#part1-translator)
-- [Part2: Typechecker](#part2-typechecker)
-- [Part3: Interpreter](#part3-interpreter)
-- [Testing](#testing)
+- [PA3: Type System](#pa3-type-system)
+  - [Setup](#setup)
+  - [Requirements](#requirements)
+  - [Submitting](#submitting)
+  - [Language Specification](#language-specification)
+  - [Part1: Translator](#part1-translator)
+  - [Part2: Type checker](#part2-type-checker)
+  - [Part3: Interpreter](#part3-interpreter)
+  - [Testing](#testing)
 
 <!-- /TOC -->
 
