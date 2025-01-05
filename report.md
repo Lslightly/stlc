@@ -40,13 +40,45 @@ python run_tests.py # 执行测试
 
 按照[README.md](README.md)给出的规则编写match匹配语句即可。
 
+### translator
+
+针对let的5条目规则分别编写从`Lang.Pattern`到`IR.Term`的转换。其中变量命名和[RAEDME](README.md)中给出的规则基本一致。
+
+```ocaml
+    match (p, t1, t2) with
+      | (Lang.Pattern.Wildcard, _, _) -> (*let 1*)
+          let t2' = translate_term t2 in t2'
+      | (Lang.Pattern.Var(x, xtype), t1, t2) -> (*let 2*)
+          let t1' = translate_term t1 in
+          let t2' = translate_term t2 in
+          IR.Term.App (IR.Term.Lam (x, translate_type xtype, t2'), t1')
+      | (Lang.Pattern.Alias(rho, x, xtype), t1, t2)  -> (*let 3*)
+          let t1' = translate_term t1 in
+          let t' = translate_term (Lang.Term.Let(rho, t1, t2)) in
+          IR.Term.App (
+            IR.Term.Lam(x, translate_type xtype, t'),
+            t1'
+          )
+      | (Lang.Pattern.Tuple(p1, p2), t1, t2) -> (*let 4*)
+          let t' = translate_term (
+            Lang.Term.Let(p1, Lang.Term.Project(t1, Left),
+              Lang.Term.Let(p2, Lang.Term.Project(t1, Right), t2)
+            )
+          ) in
+          t'
+      | (Lang.Pattern.TUnpack(capX, x), t1, t2) -> (*let 5*)
+          let t1' = translate_term t1 in
+          let t2' = translate_term t2 in
+            IR.Term.TUnpack(capX, x, t1', t2')
+```
+
 ### typechecker
 
 typechecker部分的一些难点在于对`env`和`tenv`的处理。当出现 $\Gamma, x: \tau_1 \vdash t: \tau_2$ 时，需要将 $x: \tau_1$ 将入`env`中(Map.set)。对于 $\Gamma, X \vdash ...$ 的情况，需要将X加入`tenv`中(Set.add)。
 
 ### interpreter
 
-interpreter需在每个trystep case处理Err的情况，需要通过`Err e -> Err e`将错误传递给上层。
+interpreter需在每个trystep case处理Err的情况，需要通过`Err e -> Err e`将错误传递给上层。其余按照规则处理即可。
 
 ## 实验遇到的困难与解决
 
